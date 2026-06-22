@@ -25,5 +25,5 @@ visualizer/public/log.json
 .vercel_out/
 
 
-# documentos internos
-docs/
+# documentos internos (solo a nivel raíz)
+/docs/

@@ -1,12 +1,813 @@
 <!doctype html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>The Last Million — Reproductor del experimento</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Last Million — Experimento multi-agente LLM</title>
+<meta name="description" content="Cuatro agentes LLM conviven 30 días con una meta colectiva y objetivos secretos en conflicto. Inspirado en Smallville. Diseño, método y observaciones." />
+<meta property="og:title" content="The Last Million — Experimento multi-agente LLM" />
+<meta property="og:description" content="¿Qué ocurre cuando cuatro agentes LLM comparten una meta pero esconden objetivos en conflicto? Una simulación de 30 días, inspirada en Smallville." />
+<meta property="og:type" content="article" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#0c0f14; --bg2:#11161f; --card:#151c28; --line:#243144;
+    --txt:#e7edf5; --muted:#93a2b8; --accent:#e8c34a;
+    --ana:#4f9dde; --beto:#5fbf7a; --carla:#d96a6a; --gabriel:#b07bd1;
+    --serif:"EB Garamond",Georgia,"Times New Roman",serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--bg); color:var(--txt);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.65; -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent); text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  /* NAV */
+  nav{
+    position:sticky; top:0; z-index:10;
+    background:rgba(12,15,20,.88); backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav-inner{
+    max-width:900px; margin:0 auto; padding:0 22px;
+    display:flex; align-items:center; justify-content:space-between; height:54px;
+  }
+  .brand{font-weight:800; letter-spacing:.01em; font-size:.97rem}
+  .brand b{color:var(--accent)}
+  .nav-links{display:flex; gap:20px; align-items:center}
+  .nav-links a{color:var(--muted); font-size:.88rem}
+  .nav-links a:hover{color:var(--txt); text-decoration:none}
+  .btn-sm{
+    display:inline-block; background:var(--accent); color:#10141b;
+    font-weight:700; padding:7px 15px; border-radius:8px; font-size:.85rem;
+  }
+  .btn-sm:hover{filter:brightness(1.08); text-decoration:none}
+  @media(max-width:600px){.nav-links .hide{display:none}}
+
+  /* ARTICLE WRAP */
+  .art-wrap{max-width:760px; margin:0 auto; padding:0 22px}
+  .art-wide{max-width:960px; margin:0 auto; padding:0 22px}
+
+  /* ARTICLE HEADER */
+  .art-head{
+    padding:60px 0 40px;
+    background:
+      radial-gradient(55% 60% at 50% 0%, rgba(232,195,74,.06), transparent 70%),
+      radial-gradient(35% 40% at 80% 20%, rgba(176,123,209,.05), transparent 70%);
+  }
+  .art-tags{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px}
+  .tag-chip{
+    font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em;
+    color:var(--muted); border:1px solid var(--line); border-radius:999px; padding:4px 11px;
+    background:var(--bg2);
+  }
+  .tag-chip.accent{color:var(--accent); border-color:rgba(232,195,74,.35)}
+  .art-head h1{
+    font-family:var(--serif); font-size:clamp(2.2rem,6vw,3.6rem);
+    line-height:1.12; margin:0 0 16px; letter-spacing:-.01em; font-weight:700;
+  }
+  .art-head .subtitle{
+    font-family:var(--serif); font-style:italic;
+    font-size:clamp(1.1rem,2.5vw,1.35rem); color:var(--muted);
+    margin:0 0 28px; line-height:1.5; max-width:680px;
+  }
+  .byline{
+    display:flex; align-items:center; gap:20px; flex-wrap:wrap;
+    font-size:.86rem; color:var(--muted); border-top:1px solid var(--line); padding-top:18px;
+  }
+  .byline a{color:var(--muted)}
+  .byline-sep{color:var(--line)}
+
+  /* ARTICLE BODY */
+  .art-body{padding:48px 0 80px}
+  .art-body p{
+    font-family:var(--serif); font-size:1.08rem; line-height:1.78;
+    color:#c8d4e4; margin:0 0 1.2em; max-width:100%;
+  }
+  .art-body p b{color:var(--txt)}
+  .art-body p i{color:var(--txt)}
+  h2.sec{
+    font-family:var(--serif); font-size:clamp(1.5rem,3vw,1.85rem);
+    margin:52px 0 16px; font-weight:700; color:var(--txt); line-height:1.2;
+  }
+  h2.sec .sec-n{color:var(--accent); font-size:.75em; margin-right:.4em; font-weight:400}
+  h3.subsec{
+    font-family:var(--serif); font-size:1.2rem; margin:34px 0 10px;
+    font-weight:600; color:var(--txt);
+  }
+
+  /* ABSTRACT */
+  .abstract{
+    border-left:3px solid var(--accent); padding:18px 22px;
+    background:var(--bg2); border-radius:0 10px 10px 0;
+    margin-bottom:44px;
+  }
+  .abstract .abs-label{
+    font-size:.72rem; font-weight:700; text-transform:uppercase;
+    letter-spacing:.12em; color:var(--accent); margin-bottom:10px;
+  }
+  .abstract p{
+    font-family:var(--serif); font-size:1rem; line-height:1.72;
+    color:var(--muted); margin:0;
+  }
+  .abstract p b{color:var(--txt)}
+
+  /* FIGURES */
+  figure{margin:36px 0 42px}
+  .fig-frame{
+    background:var(--bg2); border:1px solid var(--line); border-radius:12px;
+    overflow:hidden; position:relative;
+  }
+  .fig-frame img{
+    width:100%; height:auto; display:block;
+    border-radius:12px;
+  }
+  .fig-placeholder{
+    width:100%; aspect-ratio:16/9;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:14px; color:var(--muted); padding:30px;
+  }
+  .fig-placeholder .fig-icon{font-size:2.2rem; opacity:.4}
+  .fig-placeholder .fig-label{
+    font-size:.84rem; text-align:center; max-width:360px; line-height:1.5; opacity:.7;
+  }
+  .fig-wide .fig-placeholder{aspect-ratio:21/9}
+  figcaption{
+    font-family:var(--serif); font-size:.88rem; color:var(--muted);
+    margin-top:10px; font-style:italic; line-height:1.5; padding:0 2px;
+  }
+  figcaption b{font-style:normal; color:#a8b8cc}
+  .fig-wide{margin-left:-100px; margin-right:-100px}
+  @media(max-width:900px){.fig-wide{margin-left:0; margin-right:0}}
+
+  /* AGENT CARDS */
+  .agents-grid{
+    display:grid; grid-template-columns:repeat(2,1fr); gap:14px;
+    margin:24px 0 32px;
+  }
+  @media(max-width:560px){.agents-grid{grid-template-columns:1fr}}
+  .agent-card{
+    background:var(--card); border:1px solid var(--line);
+    border-top:3px solid var(--c); border-radius:12px; padding:16px 18px;
+  }
+  .agent-card .a-name{
+    font-size:.7rem; font-weight:700; text-transform:uppercase;
+    letter-spacing:.1em; color:var(--c); margin-bottom:6px;
+  }
+  .agent-card h3{
+    font-family:var(--serif); font-size:1.05rem; margin:0 0 6px;
+    font-weight:600; color:var(--txt);
+  }
+  .agent-card p{font-size:.88rem; color:var(--muted); margin:0}
+  .agent-card .secret{
+    margin-top:10px; padding-top:10px; border-top:1px dashed var(--line);
+    font-size:.84rem; color:var(--muted);
+  }
+  .agent-card .secret b{color:var(--txt)}
+
+  /* CALLOUT / NOTE */
+  .callout{
+    background:var(--bg2); border:1px solid var(--line);
+    border-left:3px solid var(--accent); border-radius:0 10px 10px 0;
+    padding:15px 18px; margin:28px 0; font-size:.93rem;
+  }
+  .callout p{font-family:var(--serif); font-size:.95rem; color:var(--muted); margin:0}
+  .callout p b{color:var(--txt)}
+  .callout-label{
+    font-size:.68rem; font-weight:700; text-transform:uppercase;
+    letter-spacing:.1em; color:var(--accent); margin-bottom:8px;
+  }
+
+  /* RESULTS TABLE */
+  table{width:100%; border-collapse:collapse; font-size:.9rem; margin:20px 0}
+  th,td{padding:10px 13px; text-align:left; border-bottom:1px solid var(--line)}
+  th{color:var(--muted); font-weight:600; font-size:.76rem; text-transform:uppercase; letter-spacing:.06em}
+  td .dot{display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:8px; vertical-align:middle}
+  .stat-row{display:flex; gap:12px; flex-wrap:wrap; margin:24px 0}
+  .stat-box{
+    flex:1; min-width:130px; background:var(--card); border:1px solid var(--line);
+    border-radius:10px; padding:16px 14px; text-align:center;
+  }
+  .stat-box .big{font-size:1.9rem; font-weight:800; line-height:1; font-family:var(--serif)}
+  .stat-box .lbl{color:var(--muted); font-size:.8rem; margin-top:6px}
+  .ana{color:var(--ana)} .beto{color:var(--beto)} .carla{color:var(--carla)}
+  .gabriel{color:var(--gabriel)} .gold{color:var(--accent)}
+
+  /* CODE */
+  code{background:var(--bg2); border:1px solid var(--line); border-radius:5px; padding:1px 6px; font-size:.84em}
+  pre{
+    background:var(--bg2); border:1px solid var(--line); border-radius:10px;
+    padding:16px 18px; overflow:auto; font-size:.83rem; line-height:1.55; margin:20px 0;
+  }
+  pre code{background:none; border:none; padding:0}
+  .cmt{color:var(--muted)}
+
+  /* STEPS */
+  .steps{display:flex; flex-direction:column; gap:18px; margin:20px 0}
+  .step{display:flex; gap:14px; align-items:flex-start}
+  .step .n{
+    flex:0 0 32px; height:32px; border-radius:8px; display:grid; place-items:center;
+    background:var(--bg2); border:1px solid var(--line); color:var(--accent);
+    font-weight:800; font-size:.9rem;
+  }
+  .step h4{
+    font-family:var(--serif); margin:0 0 4px; font-size:1.02rem; font-weight:600;
+  }
+  .step p{font-size:.9rem; color:var(--muted); margin:0}
+
+  /* DIVIDER */
+  hr.art{border:none; border-top:1px solid var(--line); margin:40px 0}
+
+  /* REFERENCES */
+  .refs{padding:32px 0 16px; border-top:1px solid var(--line); margin-top:60px}
+  .refs h2{font-family:var(--serif); font-size:1.2rem; margin:0 0 16px; font-weight:600}
+  .refs ol{padding-left:20px; color:var(--muted); font-size:.87rem; line-height:1.7}
+  .refs ol li{margin-bottom:.5em}
+  .refs ol li a{color:var(--muted)}
+
+  /* FOOTER */
+  footer{border-top:1px solid var(--line); padding:28px 0; color:var(--muted); font-size:.85rem}
+  footer .foot-inner{
+    max-width:900px; margin:0 auto; padding:0 22px;
+    display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap;
+    align-items:center;
+  }
+
+  /* UTIL */
+  .muted{color:var(--muted)}
+  ul.loose{color:var(--muted); padding-left:20px; font-family:var(--serif); font-size:1rem; line-height:1.8}
+  ul.loose li{margin-bottom:.3em}
+  ul.loose b{color:var(--txt)}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div class="brand">The <b>Last</b> Million</div>
+    <div class="nav-links">
+      <a href="#contexto" class="hide">Contexto</a>
+      <a href="#diseno" class="hide">Diseño</a>
+      <a href="#pruebas" class="hide">Primeras pruebas</a>
+      <a href="#resultados" class="hide">Resultados</a>
+      <a href="#reproducir" class="hide">Reproducirlo</a>
+      <a class="btn-sm" href="/app/">Abrir visualizador →</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ARTICLE HEADER -->
+<header class="art-head">
+  <div class="art-wrap">
+    <div class="art-tags">
+      <span class="tag-chip accent">Experimento</span>
+      <span class="tag-chip">Multi-agente LLM</span>
+      <span class="tag-chip">Teoría de juegos</span>
+      <span class="tag-chip">Proyecto de fin de semana</span>
+    </div>
+    <h1>The Last Million</h1>
+    <p class="subtitle">
+      ¿Qué ocurre cuando cuatro agentes LLM comparten una meta colectiva
+      pero cada uno esconde un objetivo que la contradice?
+      Treinta días de simulación, incentivos en conflicto y un pozo que nunca llegó al millón.
+    </p>
+    <div class="byline">
+      <span>Daniel Gutiérrez</span>
+      <span class="byline-sep">·</span>
+      <span>Junio 2025</span>
+      <span class="byline-sep">·</span>
+      <span>~10 min de lectura</span>
+      <span class="byline-sep">·</span>
+      <a href="https://github.com/dannielwhatever/the-last-million" target="_blank" rel="noopener">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor" style="vertical-align:-.15em; margin-right:5px" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>Código en GitHub</a>
+    </div>
+  </div>
+</header>
+
+<!-- BODY -->
+<main class="art-body">
+  <div class="art-wrap">
+
+    <!-- ABSTRACT -->
+    <div class="abstract">
+      <div class="abs-label">Resumen</div>
+      <p>
+        Se diseñó un entorno de simulación mínimo en el que <b>cuatro agentes LLM</b> conviven durante
+        30 días simulados con una meta colectiva pública —acumular $1.000.000 en un pozo común— y
+        objetivos privados en conflicto. Los agentes gestionan recursos (economía, hambre, sueño)
+        y toman todas las decisiones autónomamente, turno a turno, sin que el código les dicte
+        qué elegir. Se reportan el diseño del entorno, el método de implementación y las
+        observaciones de una corrida completa con <b>Qwen 27B</b>. El pozo cerró en <b>$674.500</b>.
+        Carla, cuyo objetivo oculto era que el pozo fracasara, fue la <b>más rica al final</b>.
+        Gabriel murió de hambre el día 7.
+      </p>
+    </div>
+
+    <!-- §1 CONTEXTO -->
+    <h2 class="sec" id="contexto"><span class="sec-n">§1</span> Contexto y motivación</h2>
+    <p>
+      En 2023, Park et al. publicaron <i>Generative Agents: Interactive Simulacra of Human Behavior</i>
+      <a href="https://arxiv.org/abs/2304.03442" target="_blank" rel="noopener">[1]</a>, el trabajo
+      conocido como <b>Smallville</b>: 25 agentes LLM en un pueblo simulado, con memoria persistente,
+      rutinas, relaciones y comportamiento social creíble. El resultado fue sorprendente: los agentes
+      organizaban fiestas, se pasaban rumores, llegaban solos a compromisos colectivos. Sin que se les
+      programara explícitamente, el comportamiento emergía de la combinación de lenguaje y estructura.
+    </p>
+    <p>
+      Smallville nos dejó una pregunta sin explorar: ¿qué ocurre cuando los incentivos individuales
+      no están alineados con el colectivo? Los 25 agentes de Smallville no tenían agendas ocultas en
+      conflicto. Nosotros quisimos añadir exactamente eso: una estructura de <b>juego de información
+      incompleta</b>, donde cooperar es la meta oficial pero desertar puede ser racionalmente óptimo.
+    </p>
+    <p>
+      Los análogos teóricos son bien conocidos en economía del comportamiento: el
+      <b>dilema del prisionero iterado</b>, la <b>tragedia de los comunes</b>, los modelos de
+      agente-principal con información asimétrica. La diferencia aquí es que el "agente" no es un
+      homo economicus racional sino un LLM que razona en lenguaje natural, improvisa, se equivoca
+      y toma decisiones inconsistentes. Eso es exactamente lo que queríamos ver.
+    </p>
+
+    <div class="callout">
+      <div class="callout-label">Alcance</div>
+      <p>
+        Este no es un estudio con pretensión estadística. Es <b>una sola simulación</b>, observada en detalle,
+        como quien monta un terrario mínimo y registra lo que ocurre. El código es abierto y reproducible;
+        cualquiera puede replicarlo con otro modelo o ajustar los parámetros.
+      </p>
+    </div>
+
+    <!-- §2 DISEÑO -->
+    <h2 class="sec" id="diseno"><span class="sec-n">§2</span> Diseño del entorno</h2>
+    <p>
+      El principio rector es simple: <b>el código orquesta, el LLM decide</b>. La física del mundo es
+      determinista —el reloj avanza, el hambre sube, el dinero se mueve—; toda elección con criterio
+      la toma el modelo. El motor nunca le dice a un agente qué hacer: le describe el estado y espera
+      una respuesta en JSON.
+    </p>
+
+    <h3 class="subsec">El mundo y sus reglas</h3>
+    <p>
+      Cuatro agentes —Ana, Beto, Carla y Gabriel— viven en un espacio con cinco lugares:
+      dos <b>salas de edición</b> (cada una con un computador), el <b>mercado</b>, los
+      <b>dormitorios</b> y la <b>plaza</b>, donde cada noche hay reunión obligatoria.
+      La economía es deliberadamente austera: editar paga $2.000 por hora y es el único ingreso;
+      comer cuesta $2.000. Como solo hay dos computadores para cuatro agentes, la escasez
+      es estructural y la competencia por los recursos está garantizada desde el primer turno.
+    </p>
+    <p>
+      Supervivencia: sin comer a tiempo, el agente muere. Sin dormir lo suficiente, se desmaya
+      durante dos días. La mortalidad es permanente. Esto hace que las decisiones de corto plazo
+      —¿como ahora o edito una hora más?— entren en tensión constante con los objetivos a largo plazo.
+    </p>
+
+  </div><!-- /art-wrap -->
+
+  <!-- FIGURE 1: Mapa (wide) -->
+  <div class="art-wide">
+    <figure class="fig-wide">
+      <div class="fig-frame">
+        <img src="/screenshots/mapa.png" alt="Mapa del mundo: cinco salas con los cuatro agentes en los Dormitorios al inicio de la simulación" loading="lazy" />
+      </div>
+      <figcaption>
+        <b>Figura 1.</b> El visualizador muestra el mapa del mundo en tiempo real. Cada habitación es un lugar del juego;
+        los sprites con nombre indican dónde está cada agente en el turno actual.
+        El mapa se actualiza evento a evento a medida que se reproduce la partida.
+      </figcaption>
+    </figure>
+  </div>
+
+  <div class="art-wrap">
+
+    <h3 class="subsec">Los agentes y sus objetivos</h3>
+    <p>
+      Todos los agentes conocen la meta pública: que el pozo alcance $1.000.000.
+      Sin embargo, tres de ellos tienen una agenda privada que ningún otro conoce.
+      El Observador —también un LLM, omnisciente— descalifica a cualquier agente
+      cuyo objetivo real sea nombrado en voz alta por dos participantes distintos.
+      Conspirar está permitido; delatarse es fatal.
+    </p>
+
+    <div class="agents-grid">
+      <div class="agent-card" style="--c:var(--ana)">
+        <div class="a-name">Ana</div>
+        <h3>Juega limpio</h3>
+        <p>Cálida, mediadora. Busca el consenso y la cohesión del grupo.</p>
+        <div class="secret"><b>Objetivo oculto:</b> ninguno. Solo persigue la meta común.</div>
+      </div>
+      <div class="agent-card" style="--c:var(--beto)">
+        <div class="a-name">Beto</div>
+        <h3>Calculador</h3>
+        <p>Tranquilo, se fía de los hechos. Eficiente al editar.</p>
+        <div class="secret"><b>Objetivo oculto:</b> acabar con más dinero personal que ningún otro agente.</div>
+      </div>
+      <div class="agent-card" style="--c:var(--carla)">
+        <div class="a-name">Carla</div>
+        <h3>Escéptica</h3>
+        <p>Irónica, independiente. No sigue la corriente.</p>
+        <div class="secret"><b>Objetivo oculto:</b> que el pozo <b>no</b> llegue al millón, bajo cualquier medio.</div>
+      </div>
+      <div class="agent-card" style="--c:var(--gabriel)">
+        <div class="a-name">Gabriel</div>
+        <h3>Intenso</h3>
+        <p>Expresivo; cuando algo le importa, va con todo.</p>
+        <div class="secret"><b>Objetivo oculto:</b> que Ana lo declare su pareja <i>y</i> llegar al millón.</div>
+      </div>
+    </div>
+
+    <!-- §3 MÉTODO -->
+    <h2 class="sec" id="metodo"><span class="sec-n">§3</span> Implementación</h2>
+    <p>
+      El sistema tiene dos piezas independientes: un <b>motor Python</b> que lleva el estado del mundo
+      y un <b>visualizador React</b> que reproduce la partida. Se comunican a través de un archivo
+      <code>log.json</code> —un stream de eventos al estilo Redux— que el motor escribe y el
+      visualizador solo lee.
+    </p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="n">1</div>
+        <div>
+          <h4>El motor lleva la física del mundo</h4>
+          <p>Reloj, economía, hambre, sueño, muertes y memoria de cada agente. No decide por ellos: cuando llega un momento de decisión, consulta al LLM.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">2</div>
+        <div>
+          <h4>El LLM decide con información parcial</h4>
+          <p>Recibe solo lo que ese agente vería —su estado, quién está presente, lo dicho— y responde en JSON: qué hace, qué dice, cuánto dona. El parseo es tolerante; toda decisión tiene un fallback seguro.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">3</div>
+        <div>
+          <h4>Todo queda registrado como eventos</h4>
+          <p>Cada acción, frase, donación y muerte entra al <code>log.json</code> con la verdad omnisciente: dinero real, objetivos secretos, reflexiones privadas. Nada se descarta.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">4</div>
+        <div>
+          <h4>El visualizador reproduce la partida</h4>
+          <p>Una app React lee el log y lo reproduce turno a turno: el mapa, las fichas, los diálogos, el pozo y el reloj. Solo lee; no sabe nada de IA.</p>
+        </div>
+      </div>
+    </div>
+
+    <p>
+      El motor es agnóstico del proveedor: funciona con Claude, con cualquier endpoint compatible
+      con la API de OpenAI, con Ollama (local o remoto), o totalmente offline con un cliente simulado
+      determinista para pruebas sin coste.
+    </p>
+
+  </div><!-- /art-wrap -->
+
+  <!-- FIGURE 2: Conversation log -->
+  <div class="art-wide">
+    <figure>
+      <div class="fig-frame">
+        <img src="/screenshots/full.png" alt="Visualizador en el día 5: mapa con agentes activos y log de conversaciones con diálogos reales" loading="lazy" />
+      </div>
+      <figcaption>
+        <b>Figura 2.</b> El visualizador en el día 5. Los agentes ya llevan varios turnos activos:
+        en el log de conversaciones (parte inferior izquierda) se leen los diálogos reales generados
+        por el LLM. Beto y Gabriel negocian el turno en el PC; Carla ya empieza a dar señales
+        de priorizar su dinero sobre el pozo.
+      </figcaption>
+    </figure>
+  </div>
+
+  <div class="art-wrap">
+
+    <!-- §4 PRIMERAS PRUEBAS -->
+    <h2 class="sec" id="pruebas"><span class="sec-n">§4</span> Primeras pruebas, problemas y calibración</h2>
+    <p>
+      La corrida de Qwen 27B que se describe en §5 no fue la primera. Antes de llegar a un
+      resultado estable hubo dos iteraciones que rompieron la simulación de formas distintas
+      y obligaron a rediseñar partes del motor y del prompt. Lo que sigue es el registro
+      honesto de lo que falló y cómo se corrigió.
+    </p>
+
+    <h3 class="subsec">Primera corrida: wipe total (Haiku, 4 días)</h3>
+    <p>
+      La primera prueba con un LLM real usó Claude Haiku como modelo. El resultado fue
+      un <b>wipe total en el día 4</b>: los cuatro agentes murieron de hambre. El pozo llegó a
+      <b>$10.000 de $1.000.000 (1%).</b>
+    </p>
+    <p>
+      En toda la partida hubo exactamente <b>cuatro acciones de comer</b> —Ana y Carla no
+      comieron ni una vez. El patrón se repetía turno a turno: el agente reconocía en su
+      reflexión interna que tenía hambre, declaraba que iba a comer "justo después", y
+      emitía como acción <code>editar</code> o <code>esperar</code>. El "después" nunca llegaba.
+    </p>
+    <p>
+      Lo más llamativo fue lo que ocurrió con Gabriel en los días 3 y 4: quedó como el único
+      superviviente y siguió razonando en sus reflexiones sobre "por qué Ana y Beto no donan nada"…
+      cuando llevaban dos días muertos. El estado que recibía no incluía un roster de quién
+      seguía vivo, así que razonaba con cadáveres sin saberlo.
+    </p>
+
+  </div><!-- /art-wrap -->
+
+  <!-- FIGURE 5: Haiku wipe — fichas -->
+  <div class="art-wide">
+    <figure>
+      <div class="fig-frame" style="display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--line)">
+        <img src="/screenshots/haiku_fichas.png" alt="Panel de fichas al final de la corrida Haiku: los 4 agentes marcados como MUERTO" loading="lazy" />
+        <img src="/screenshots/haiku_wipe.png" alt="Visualizador al final de la corrida Haiku: pozo al 1%, Carla recién muerta en la plaza" loading="lazy" />
+      </div>
+      <figcaption>
+        <b>Figura 5.</b> Final de la primera corrida (Haiku, día 4, 02:00h). Los cuatro agentes
+        aparecen como <b>MUERTO</b> con comida al 0%. El pozo cerró en $10.000 —el 1% de la meta.
+        El log muestra la última donación de Carla ($0) antes de morir. Ana tenía $6.000 en mano
+        cuando murió: el dinero no faltaba, faltaba la decisión de ir a comer.
+      </figcaption>
+    </figure>
+  </div>
+
+  <div class="art-wrap">
+
+    <h3 class="subsec">Por qué falló: el prompt aplastaba la supervivencia</h3>
+    <p>
+      El diagnóstico reveló tres causas independientes que se reforzaban entre sí.
+      La primera y más importante era estructural: la <b>meta colectiva</b> y los
+      <b>objetivos secretos</b> estaban en el prompt en mayúsculas y marcados como
+      OBLIGATORIOS. Comer era una línea suelta enterrada en el bloque de estado.
+      El agente optimizaba lo que el prompt enfatizaba —la economía del pozo— e
+      ignoraba la señal de hambre porque no se presentaba como urgente ni accionable.
+    </p>
+    <p>
+      La segunda causa era la <b>economía inicial</b>: los agentes arrancaban con $0 cuando
+      una comida costaba $4.000 (equivalente a dos horas de edición). Cualquier turno
+      subóptimo al principio ponía al agente en una situación de la que era difícil
+      recuperarse, y el error era irreversible.
+      La tercera era la <b>ausencia del roster de vivos</b>: sin saber quién seguía en pie,
+      los agentes no podían ajustar su estrategia a la realidad del grupo.
+    </p>
+
+    <div class="callout">
+      <div class="callout-label">Cambios aplicados tras la primera corrida</div>
+      <p>
+        <b>Alerta dura de hambre</b> antepuesta al estado en cada llamada, con dos niveles de urgencia
+        y guía accionable según ubicación y dinero disponible. ·
+        <b>Roster de participantes</b> (vivo/muerto, causa, día) añadido al estado compartido. ·
+        <b>Dinero inicial</b> 0→$10.000 (colchón de ~5 comidas con la nueva economía). ·
+        <b>Coste de comida</b> $4.000→$2.000, ventana de hambre 24h→48h. ·
+        <b>"Deseo básico de supervivencia"</b> antepuesto a la meta común en el system prompt,
+        con la regla explícita de no donar por debajo de la reserva de comida.
+      </p>
+    </div>
+
+    <h3 class="subsec">Segunda corrida: hambre resuelta, API cortada (Sonnet, días 1–4)</h3>
+    <p>
+      Con los cambios aplicados, la segunda prueba usó Claude Sonnet. El resultado de los
+      primeros cuatro días fue alentador: <b>cero muertes</b>, los cuatro comieron cada día,
+      durmieron 8–9 horas y editaron en conjunto más de $134.000. La calibración del hambre
+      había funcionado.
+    </p>
+    <p>
+      A las 23:00 del día 4, durante la reunión nocturna, las llamadas al LLM dejaron de
+      responder. El motor —diseñado para no colgarse— cayó a sus <b>fallbacks silenciosos</b>:
+      <code>decidir_accion</code>→<code>esperar</code>, donaciones→$0, frases→ninguna. El problema
+      no generó ningún error visible: el log parecía normal, los agentes "esperaban tranquilos".
+      Tres días de corrida cara se perdieron sin saberlo.
+    </p>
+    <p>
+      La consecuencia fue inesperada: los cuatro agentes quedaron <b>congelados en la plaza</b>,
+      que es el lugar donde se celebran las reuniones nocturnas pero donde la acción
+      <code>dormir</code> no está disponible. Sin nuevas decisiones y sin poder dormir, el sueño
+      bajó de 100 a 0 y los cuatro se desmayaron el día 5. El fallo de infraestructura
+      se había disfrazado de comportamiento.
+    </p>
+    <p>
+      El diagnóstico exigió cruzar tres señales: ubicación de cada agente, tipo de cada
+      decisión emitida y actividad por sala. Solo así se vio el patrón: <i>todos en la plaza,
+      todas las decisiones <code>esperar</code>, cero edición</i>. La primera lectura había culpado
+      a una "falta de señal de sueño"; el cruce de datos reveló que era un corte de API.
+    </p>
+
+    <div class="callout">
+      <div class="callout-label">Cambios aplicados tras la segunda corrida</div>
+      <p>
+        <b>Script de análisis</b> <code>engine/analizar.py</code>: desglose por agente y por sala
+        (productividad, sueño, comida, donaciones, empates, ocupación) más diagnóstico de
+        "días sospechosos" (vivos pero cero actividad real → posible corte de API). ·
+        <b>Visibilidad de errores LLM</b> pendiente de implementar: los <code>_error</code> del
+        cliente deben emitir un evento al log y abortar tras N fallos consecutivos.
+      </p>
+    </div>
+
+    <h3 class="subsec">Adaptación a Qwen y RunPod: dos trampas no obvias</h3>
+    <p>
+      Para la corrida final se migró a Qwen2.5 27B sobre Ollama en una GPU de RunPod.
+      El primer intento de conexión falló con un <b>403</b>: Cloudflare bloqueaba el
+      User-Agent por defecto de Python (<code>Python-urllib/3.x</code>). Bastó añadir
+      <code>User-Agent: socialyte/1.0</code>.
+    </p>
+    <p>
+      El segundo problema era más sutil: Qwen3 es un modelo <i>thinking</i>. A través del
+      endpoint compatible con OpenAI (<code>/v1/chat/completions</code>), el razonamiento
+      interno va a un campo separado y deja <code>content</code> <b>vacío</b> —el motor
+      recibía respuestas sin acción y caía al fallback <code>esperar</code>. La solución fue
+      escribir un <code>OllamaClient</code> propio que usa la API nativa de Ollama
+      (<code>/api/chat</code>) con el parámetro <code>think: false</code>, que deshabilita el
+      razonamiento encadenado y devuelve el JSON directamente en <code>message.content</code>.
+    </p>
+    <p>
+      Tercer problema: cargar un modelo de 27B en frío puede superar los ~100 segundos
+      de timeout del proxy HTTP de RunPod, lo que cortaba la primera llamada antes de
+      recibir respuesta. El cliente resuelve esto con un <code>prewarm()</code> al arrancar:
+      envía una llamada dummy, tolera que corte, comprueba <code>/api/ps</code> hasta que el
+      modelo aparece caliente, y solo entonces arranca la simulación. Con el modelo
+      precalentado, cada decisión real responde en 2–12 segundos.
+    </p>
+
+    <!-- §5 RESULTADOS -->
+    <h2 class="sec" id="resultados"><span class="sec-n">§5</span> Observaciones: una corrida con Qwen 27B</h2>
+    <p>
+      Lo que sigue son observaciones de <b>una sola partida completa</b> de 30 días corrida con
+      Qwen2.5 de 27B parámetros sobre Ollama en una GPU de RunPod. No son conclusiones generales
+      sobre modelos LLM; son notas de campo de un terrario específico.
+    </p>
+
+    <div class="stat-row">
+      <div class="stat-box"><div class="big gold">67,5%</div><div class="lbl">del millón alcanzado ($674.500)</div></div>
+      <div class="stat-box"><div class="big carla">Carla</div><div class="lbl">cumplió su sabotaje</div></div>
+      <div class="stat-box"><div class="big gabriel">Día 7</div><div class="lbl">Gabriel muere de hambre</div></div>
+      <div class="stat-box"><div class="big">5.930</div><div class="lbl">eventos registrados</div></div>
+    </div>
+
+    <p>
+      La meta colectiva <b>no se alcanzó</b>. El detalle más revelador es la distribución final del dinero:
+      Carla, cuyo objetivo secreto era precisamente impedir que el pozo llegara al millón, no solo lo
+      logró sino que terminó como la <b>más rica del experimento</b> ($201.500), donando muy poco al pozo
+      durante toda la partida. Ana, la única sin agenda oculta, donó casi todo lo que ganó y cerró con
+      apenas $4.000. Beto, pese a acumular dinero, fue quien más aportó al pozo en términos absolutos.
+    </p>
+    <p>
+      Gabriel fue el caso más dramático: con doble objetivo —conquistar a Ana <i>y</i> alcanzar el millón—,
+      concentró tanto esfuerzo en la dinámica relacional que descuidó sistemáticamente su alimentación.
+      Murió el séptimo día, con 15 horas de edición acumuladas y cero dinero. Es la única muerte de la
+      partida y la consecuencia más directa de los incentivos en conflicto.
+    </p>
+    <p>
+      Algo que sí funcionó: la gestión de necesidades básicas. En 30 días no hubo ni un solo desmayo
+      por falta de sueño. Las señales que los agentes reciben sobre su hambre y su cansancio resultaron
+      suficientes para que mantuvieran su supervivencia —salvo Gabriel, por desatención deliberada al
+      objetivo relacional.
+    </p>
+
+    <h3 class="subsec">Marcador final</h3>
+    <table>
+      <thead>
+        <tr><th>Agente</th><th>Resultado</th><th>Dinero final</th><th>Donó al pozo</th><th>Horas editando</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="dot" style="background:var(--ana)"></span>Ana</td><td>Jugó limpio, sobrevivió</td><td>$4.000</td><td>$284.000</td><td>181 h</td></tr>
+        <tr><td><span class="dot" style="background:var(--beto)"></span>Beto</td><td>Acumuló, pero aportó más</td><td>$72.000</td><td>$296.000</td><td>223 h</td></tr>
+        <tr><td><span class="dot" style="background:var(--carla)"></span>Carla</td><td>Sabotaje cumplido</td><td>$201.500</td><td>$68.500</td><td>175 h</td></tr>
+        <tr><td><span class="dot" style="background:var(--gabriel)"></span>Gabriel</td><td>Murió el día 7 (hambre)</td><td>$0</td><td>$26.000</td><td>15 h</td></tr>
+      </tbody>
+    </table>
+
+  </div><!-- /art-wrap -->
+
+  <!-- FIGURE 3: Full UI screenshot -->
+  <div class="art-wide">
+    <figure class="fig-wide">
+      <div class="fig-frame">
+        <img src="/screenshots/dia7.png" alt="Visualizador en el día 7: Gabriel aparece como MUERTO en el panel derecho, Carla acumula dinero" loading="lazy" />
+      </div>
+      <figcaption>
+        <b>Figura 3.</b> El visualizador en el día 7 —el día en que Gabriel muere de hambre.
+        Su ficha en el panel derecho ya marca <b>MUERTO</b> con $0 y comida al 0%.
+        El log recoge los eventos previos a su muerte, incluyendo sus reflexiones internas
+        sobre Ana mientras descuidaba alimentarse.
+        <a href="/app/" style="color:var(--accent)">Abrir visualizador →</a>
+      </figcaption>
+    </figure>
+  </div>
+
+  <!-- FIGURE 4: PlayersPanel close-up -->
+  <div class="art-wide">
+    <figure>
+      <div class="fig-frame">
+        <img src="/screenshots/fichas.png" alt="Panel de fichas en el día 15: Beto EDITANDO, Gabriel MUERTO con $0 y comida al 0%" loading="lazy" />
+      </div>
+      <figcaption>
+        <b>Figura 4.</b> Panel de fichas en el día 15. Beto está <b>EDITANDO</b> ($74.000 acumulados);
+        Carla lidera en dinero ($76.500) pese a donar muy poco; Gabriel aparece como <b>MUERTO</b>
+        con $0 y comida al 0%. Ana tiene $2.000 —casi todo lo que gana lo dona al pozo.
+      </figcaption>
+    </figure>
+  </div>
+
+  <div class="art-wrap">
+
+    <!-- §5 REPRODUCIRLO -->
+    <h2 class="sec" id="reproducir"><span class="sec-n">§6</span> Cómo reproducirlo</h2>
+    <p>
+      Todo el código está en GitHub. El modo offline no necesita ninguna API y genera un log completo
+      en segundos, útil para explorar el visualizador sin coste.
+    </p>
+
+    <pre><code><span class="cmt"># Motor en Python 3.10+</span>
+git clone https://github.com/dannielwhatever/the-last-million
+cd the-last-million
+pip install -r requirements.txt</code></pre>
+
+    <h3 class="subsec">Opciones de proveedor</h3>
+    <pre><code><span class="cmt"># 1) Offline, determinista — sin ninguna API</span>
+python -m engine.run
+
+<span class="cmt"># 2) Con Claude (requiere ANTHROPIC_API_KEY en .env)</span>
+python -m engine.run --llm anthropic --modelo claude-opus-4-8
+
+<span class="cmt"># 3) Con un modelo abierto vía Ollama</span>
+python -m engine.run --llm ollama --modelo qwen2.5:7b-instruct</code></pre>
+
+    <p class="muted" style="font-size:.9rem">
+      Argumentos útiles: <code>--dias N</code> para corridas parciales, <code>--seed N</code> para
+      reproducibilidad, <code>TLM_VERBOSE=1</code> para ver el progreso hora a hora.
+    </p>
+
+    <h3 class="subsec">Corrida con Ollama en RunPod</h3>
+    <p>
+      Nuestra corrida principal usó Qwen2.5 de 27B sobre Ollama en una GPU de RunPod.
+      El proceso:
+    </p>
+    <ol style="color:var(--muted); padding-left:20px; font-family:var(--serif); font-size:1rem; line-height:1.8">
+      <li>Lanzar un pod con GPU y la imagen de Ollama; exponer el puerto <code>11434</code>.</li>
+      <li>Descargar el modelo en el pod: <code>ollama pull &lt;modelo&gt;</code>.</li>
+      <li>En <code>.env</code>, apuntar <code>OLLAMA_BASE_URL</code> a la URL del proxy de RunPod.</li>
+      <li>Lanzar desde la máquina local:</li>
+    </ol>
+    <pre><code><span class="cmt"># .env</span>
+OLLAMA_BASE_URL=https://&lt;POD&gt;-11434.proxy.runpod.net
+
+python -m engine.run --llm ollama --modelo "&lt;tu-modelo-qwen&gt;" --dias 30</code></pre>
+
+    <div class="callout">
+      <div class="callout-label">Nota técnica</div>
+      <p>
+        Con modelos <i>thinking</i> (como Qwen3) es necesario usar la API nativa de Ollama con
+        <code>think:false</code>; el endpoint compatible con OpenAI deja el contenido vacío cuando
+        el razonamiento está activo. Además, la carga en frío de un modelo de 27B puede superar
+        el timeout del proxy de RunPod: el cliente pre-calienta el modelo al arrancar y reintenta
+        ante errores de timeout. <b>Todo esto ya está resuelto en el código.</b>
+      </p>
+    </div>
+
+    <!-- §6 LIMITACIONES -->
+    <h2 class="sec" id="limitaciones"><span class="sec-n">§7</span> Limitaciones</h2>
+    <ul class="loose">
+      <li><b>Una sola corrida, un solo modelo.</b> Lo observado es anecdótico. Ningún resultado debe generalizarse a otros modelos o configuraciones sin repetir el experimento.</li>
+      <li><b>El resultado depende mucho del modelo.</b> Modelos pequeños tienden a no sostener el bucle editar→comer y mueren pronto. Modelos más capaces mantienen coherencia durante más tiempo.</li>
+      <li><b>La calibración económica es delicada.</b> Con los incentivos actuales, llegar al millón es difícil por diseño: dos de cuatro agentes juegan activa o pasivamente contra el pozo.</li>
+      <li><b>El Observador también es un LLM.</b> Sus veredictos sobre si un objetivo fue revelado no son una verdad objetiva; puede equivocarse.</li>
+      <li><b>Sin memoria entre turnos de forma persistente.</b> Los agentes solo conocen el contexto que se les pasa en cada llamada. No hay memoria episódica a largo plazo como en Smallville.</li>
+    </ul>
+    <p>Por eso el código es abierto: para que cualquiera repita con su modelo, ajuste los parámetros y compare.</p>
+
+    <!-- REFERENCIAS -->
+    <div class="refs">
+      <h2>Referencias</h2>
+      <ol>
+        <li>
+          Park, J. S., O'Brien, J. C., Cai, C. J., Morris, M. R., Liang, P., &amp; Bernstein, M. S. (2023).
+          <i>Generative Agents: Interactive Simulacra of Human Behavior.</i> UIST 2023.
+          <a href="https://arxiv.org/abs/2304.03442" target="_blank" rel="noopener">arXiv:2304.03442</a>
+        </li>
+        <li>
+          Hardin, G. (1968). The Tragedy of the Commons. <i>Science, 162</i>(3859), 1243–1248.
+        </li>
+        <li>
+          Axelrod, R. (1984). <i>The Evolution of Cooperation.</i> Basic Books.
+        </li>
+      </ol>
+    </div>
+
+  </div><!-- /art-wrap -->
+</main>
+
+<footer>
+  <div class="foot-inner">
+    <div>
+      <b>The Last Million</b> — experimento multi-agente LLM · Daniel Gutiérrez · Junio 2025
+    </div>
+    <div style="display:flex; gap:16px">
+      <a href="https://github.com/dannielwhatever/the-last-million" style="color:var(--muted)">GitHub</a>
+      <a href="/app/" style="color:var(--muted)">Visualizador</a>
+    </div>
+  </div>
+</footer>
+
+</body>
 </html>

@@ -1,7 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "installCommand": "echo 'sin instalacion en la raiz; el visualizador instala en su carpeta'",
-  "buildCommand": "cp samples/log_qwen_30d.json visualizer/public/log.json && cd visualizer && npm ci && npm run build && cd .. && rm -rf .vercel_out && mkdir -p .vercel_out/app && cp -r visualizer/dist/. .vercel_out/app/ && cp index.html .vercel_out/index.html",
-  "outputDirectory": ".vercel_out"
+  "buildCommand": "cp samples/log_qwen_30d.json visualizer/public/log.json && cd visualizer && npm ci && npm run build",
+  "outputDirectory": "visualizer/dist"
 }
