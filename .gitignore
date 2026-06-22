@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Secretos locales (la clave de API y la URL del pod). La plantilla .env.example sí se versiona.
+.env
+.env.local
+.env.*.local
+
+# Node / visualizador
+visualizer/node_modules/
+visualizer/dist/
+visualizer/verify/*.cjs
+*.tsbuildinfo
+
+# Log generado (se regenera con el motor). La copia del visualizador también.
+# Los samples/ SÍ se versionan: son las partidas de demostración de la web.
+log.json
+visualizer/public/log.json
+
+# Vercel
+.vercel/
+.vercel_out/
+
+
+# documentos internos
+docs/
