@@ -10,7 +10,7 @@ venv/
 .env.*.local
 
 # Node / visualizador
-visualizer/node_modules/
+node_modules/
 visualizer/dist/
 visualizer/verify/*.cjs
 *.tsbuildinfo

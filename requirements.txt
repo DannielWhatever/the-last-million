@@ -1,0 +1,4 @@
+# Motor de simulación. El modo simulado (--llm mock) no requiere dependencias.
+anthropic>=0.40.0       # para --llm anthropic (Claude)
+openai>=1.40.0          # para --llm openai (OpenAI / OpenRouter / Ollama / …)
+python-dotenv>=1.0.0    # carga las claves desde un archivo .env (opcional)

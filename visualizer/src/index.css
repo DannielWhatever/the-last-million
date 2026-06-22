@@ -1,0 +1,160 @@
+/* Estética pixel-art RPG sobria (§18.2): al servicio de la legibilidad. */
+:root {
+  --bg: #15171c;
+  --panel: #1d2027;
+  --panel2: #23272f;
+  --border: #3a3f4b;
+  --text: #d7dbe3;
+  --muted: #8b93a3;
+  --accent: #d8b24a;
+  --danger: #d96a6a;
+  --observer: #b07bd1;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root { height: 100%; margin: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Courier New", ui-monospace, monospace;
+  font-size: 14px;
+  image-rendering: pixelated;
+}
+
+.loading {
+  display: flex; align-items: center; justify-content: center;
+  height: 100%; color: var(--muted); font-size: 18px; text-align: center; padding: 2rem;
+}
+.loading.error { color: var(--danger); }
+code { background: #000; padding: 2px 6px; border-radius: 3px; color: var(--accent); }
+
+.app { display: flex; flex-direction: column; height: 100%; }
+
+/* ---------- Topbar / Header ---------- */
+.topbar { border-bottom: 2px solid var(--border); padding: 8px 14px; background: var(--panel); }
+.topbar h1 { margin: 0 0 8px; font-size: 18px; letter-spacing: 1px; }
+.subtitle { color: var(--muted); font-size: 12px; font-weight: normal; }
+
+.header { display: flex; gap: 18px; align-items: center; }
+.reloj { display: flex; flex-direction: column; min-width: 110px; border: 2px solid var(--border); padding: 4px 10px; background: var(--panel2); }
+.reloj-dia { font-weight: bold; letter-spacing: 1px; }
+.reloj-de { color: var(--muted); font-weight: normal; }
+.reloj-hora { font-size: 22px; color: var(--accent); }
+.pozo { flex: 1; }
+.pozo-top { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.pozo-cifra { color: var(--text); }
+.pozo-bar { position: relative; height: 22px; background: #0d0f13; border: 2px solid var(--border); }
+.pozo-fill { height: 100%; background: linear-gradient(90deg, #b8902f, var(--accent)); transition: width .15s; }
+.pozo-pct { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+
+/* ---------- Layout principal ---------- */
+.main { flex: 1; display: grid; grid-template-columns: 1fr 360px; gap: 12px; padding: 12px; overflow: hidden; }
+.left { display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+.right { overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+
+/* ---------- Mapa (mundo RPG pixel-art) ---------- */
+.mapa-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 780px;
+  margin: 0 auto;
+  border: 2px solid var(--border);
+  background: #15171c;
+  line-height: 0;
+}
+.mapa-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+.mapa-overlay { position: absolute; inset: 0; pointer-events: none; line-height: 1; }
+.lugar-cartel {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-size: 9px;
+  letter-spacing: .3px;
+  color: #efe3c8;
+  white-space: nowrap;
+  text-shadow: 0 1px 0 #000, 0 0 2px #000;
+}
+.player-tag {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  font-size: 10px;
+  font-weight: bold;
+  white-space: nowrap;
+  text-shadow: 0 1px 0 #000, -1px 0 0 #000, 1px 0 0 #000, 0 0 3px #000;
+}
+.player-tag.muerto { text-decoration: line-through; opacity: .85; }
+
+/* ---------- Controles ---------- */
+.controls { background: var(--panel); border: 2px solid var(--border); padding: 8px; }
+.ctrl-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ctrl-row.timeline { margin-top: 8px; }
+.controls button {
+  background: var(--panel2); color: var(--text); border: 2px solid var(--border);
+  padding: 4px 8px; cursor: pointer; font-family: inherit; font-size: 13px;
+}
+.controls button:hover { border-color: var(--accent); }
+.controls button.play { background: var(--accent); color: #10131a; font-weight: bold; }
+.ctrl-day, .ctrl-speed { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 12px; }
+.controls select, .controls input[type="range"] { font-family: inherit; }
+.timeline input[type="range"] { flex: 1; }
+.ctrl-counter { color: var(--muted); font-size: 12px; min-width: 130px; text-align: right; }
+
+/* ---------- Conversación ---------- */
+.conv { flex: 1; display: flex; flex-direction: column; min-height: 0; background: var(--panel); border: 2px solid var(--border); }
+.conv-titulo { padding: 6px 10px; border-bottom: 2px solid var(--border); color: var(--muted); font-size: 12px; letter-spacing: .5px; }
+.conv-feed { flex: 1; overflow-y: auto; padding: 8px 10px; display: flex; flex-direction: column; gap: 4px; }
+.feed-item { line-height: 1.4; font-size: 13px; }
+/* Primer ítem de cada hora: más aire para separar las horas visualmente. */
+.feed-item.feed-hour-break { margin-top: 14px; }
+.conv-feed > .feed-item:first-child { margin-top: 0; }
+.feed-time { color: #5b6273; font-size: 11px; margin-right: 6px; }
+.feed-who { font-weight: bold; margin-right: 6px; }
+.feed-frase .feed-who { color: var(--text); }
+.feed-donacion .feed-who { color: var(--accent); }
+.feed-reunion { color: var(--accent); font-weight: bold; }
+.feed-dia { color: var(--muted); text-align: center; border-top: 1px dashed var(--border); margin: 6px 0; }
+.feed-observador .feed-who { color: var(--observer); }
+.feed-observador { color: #c8b3da; }
+.feed-memoria .feed-who, .feed-reflexion .feed-who { color: #6fa8dc; }
+.feed-reflexion { color: #9fb6cc; font-style: italic; }
+.feed-descubrimiento { color: var(--danger); font-weight: bold; background: #2a1618; padding: 2px 4px; }
+.feed-muerte { color: #fff; background: #5a1f22; padding: 2px 4px; font-weight: bold; }
+.feed-accion { color: var(--muted); }
+.feed-veredicto { color: var(--accent); font-weight: bold; }
+
+/* ---------- Players ---------- */
+.players { display: flex; flex-direction: column; gap: 10px; }
+.player-card { background: var(--panel); border-left: 4px solid; border: 2px solid var(--border); padding: 8px 10px; }
+.player-card.muerto { opacity: .6; }
+.player-head { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.player-sprite { flex: none; image-rendering: pixelated; }
+.player-card.muerto .player-sprite { opacity: 0.6; }
+.player-name { font-weight: bold; flex: 1; }
+.player-estado { font-size: 11px; color: var(--muted); text-transform: uppercase; }
+.player-estado.dead { color: var(--danger); }
+.metric { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-top: 4px; }
+.metric-val { color: var(--text); }
+.bar { height: 8px; background: #0d0f13; border: 1px solid var(--border); margin-top: 2px; }
+.bar-fill { height: 100%; transition: width .15s; }
+.objetivo-secreto { margin-top: 8px; padding-top: 6px; border-top: 1px dashed var(--border); }
+.secreto-label { display: block; font-size: 10px; color: var(--observer); letter-spacing: .5px; }
+.secreto-text { font-size: 12px; color: #c8b3da; }
+
+/* ---------- Veredicto ---------- */
+.veredicto { background: var(--panel); border: 2px solid var(--accent); padding: 8px 10px; }
+.veredicto-titulo { color: var(--accent); font-weight: bold; margin-bottom: 6px; }
+.veredicto-row { display: grid; grid-template-columns: 70px 90px 1fr; gap: 6px; font-size: 11px; padding: 3px 0; border-top: 1px solid var(--border); align-items: baseline; }
+.ver-quien { font-weight: bold; }
+.ver-res { font-weight: bold; }
+.r-LOGRO .ver-res { color: #5fbf7a; }
+.r-FALLO .ver-res { color: var(--muted); }
+.r-DESCALIFICADO .ver-res { color: var(--danger); }
+.r-MUERTO .ver-res { color: var(--danger); }
+.ver-razon { color: var(--muted); }

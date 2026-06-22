@@ -1,0 +1,26 @@
+{
+  "name": "socialyte",
+  "version": "1.0.0",
+  "description": "**Un reality show de agentes LLM.** Cuatro agentes autónomos (Ana, Beto, Carla y Gabriel) conviven 30 días en un mundo cerrado con una meta común —reunir un millón en un pozo compartido— y agendas secretas que pueden hundirla. Nadie programa su conducta: **el código orquesta, el LLM decide.**",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DannielWhatever/the-last-million.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DannielWhatever/the-last-million/issues"
+  },
+  "homepage": "https://github.com/DannielWhatever/the-last-million#readme",
+  "dependencies": {
+    "puppeteer": "^25.1.0"
+  }
+}
