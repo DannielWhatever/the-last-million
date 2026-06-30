@@ -30,7 +30,7 @@ Smallville dejó una pregunta sin explorar: **¿qué ocurre cuando los incentivo
 
 Los análogos teóricos son conocidos en economía del comportamiento: el **dilema del prisionero iterado**, la **tragedia de los comunes**, los modelos agente-principal con información asimétrica. La diferencia es que el "agente" no es un *homo economicus* racional sino un LLM que razona en lenguaje natural, improvisa, se equivoca y toma decisiones inconsistentes. Eso es exactamente lo que se quería ver.
 
-> **Alcance.** No es un estudio con pretensión estadística. Es **una sola simulación**, observada en detalle, como quien monta un terrario mínimo y registra lo que ocurre. El código es abierto y reproducible.
+> **Alcance.** No es un estudio con pretensión estadística. Es **una sola simulación**, observada en detalle, como quien planta un poroto y registra lo que ocurre. El código es abierto y reproducible.
 
 ---
 
