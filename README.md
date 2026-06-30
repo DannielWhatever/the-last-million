@@ -119,7 +119,9 @@ Notas de campo de **una sola partida completa** de 30 días con Qwen2.5 27B sobr
 | | | |
 |---|---|---|
 | **67,5%** del millón ($674.500) | **Carla** cumplió su sabotaje | **Día 7** muere Gabriel |
-| **5.930** eventos registrados | **0** desmayos en 30 días | **1** sola muerte |
+| **~3.200** llamadas al modelo | **5.930** eventos registrados | **0** desmayos en 30 días |
+
+Los 30 días simulados costaron **del orden de 3.200 llamadas al modelo** (~3.187 contabilizadas: una por cada decisión de turno, frase, donación, voto, reflexión y juicio del Observador), que generaron los 5.930 eventos del log. A 2–12 s por llamada con Qwen 27B en RunPod, eso supone entre 1,5 y 10 horas de cómputo del modelo para la partida completa.
 
 La meta colectiva **no se alcanzó**. El detalle más revelador es la distribución final del dinero: Carla, cuyo objetivo secreto era impedir que el pozo llegara al millón, no solo lo logró sino que terminó como la **más rica del experimento** ($201.500), donando muy poco. Ana, la única sin agenda oculta, donó casi todo y cerró con apenas $4.000. Beto, pese a acumular dinero, fue quien más aportó al pozo en términos absolutos.
 
