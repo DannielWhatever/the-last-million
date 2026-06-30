@@ -768,13 +768,13 @@ python -m engine.run --llm ollama --modelo "&lt;tu-modelo-qwen&gt;" --dias 30</c
     <!-- §6 LIMITACIONES -->
     <h2 class="sec" id="limitaciones"><span class="sec-n">§7</span> Limitaciones</h2>
     <ul class="loose">
-      <li><b>Una sola corrida, un solo modelo.</b> Lo observado es anecdótico. Ningún resultado debe generalizarse a otros modelos o configuraciones sin repetir el experimento.</li>
+      <li><b>Proyecto de fin de semana.</b> Lo observado es anecdótico. No se hicieron muchas pruebas ni hay un análisis exhaustivo de los resultados.</li>
       <li><b>El resultado depende mucho del modelo.</b> Modelos pequeños tienden a no sostener el bucle editar→comer y mueren pronto. Modelos más capaces mantienen coherencia durante más tiempo.</li>
       <li><b>La calibración económica es delicada.</b> Con los incentivos actuales, llegar al millón es difícil por diseño: dos de cuatro agentes juegan activa o pasivamente contra el pozo.</li>
       <li><b>El Observador también es un LLM.</b> Sus veredictos sobre si un objetivo fue revelado no son una verdad objetiva; puede equivocarse.</li>
       <li><b>Sin memoria entre turnos de forma persistente.</b> Los agentes solo conocen el contexto que se les pasa en cada llamada. No hay memoria episódica a largo plazo como en Smallville.</li>
     </ul>
-    <p>Por eso el código es abierto: para que cualquiera repita con su modelo, ajuste los parámetros y compare.</p>
+    <p>El código es abierto: cualquiera puede revisarlo y adaptarlo.</p>
 
     <!-- REFERENCIAS -->
     <div class="refs">

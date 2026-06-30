@@ -34,7 +34,7 @@ try {
   const page = await browser.newPage();
   await page.setViewport({ width: 1440, height: 860, deviceScaleFactor: 2 });
 
-  await page.goto("http://localhost:5173/?nocache=" + Date.now(), {
+  await page.goto("http://localhost:5173/app/?nocache=" + Date.now(), {
     waitUntil: "networkidle2", timeout: 15000,
   });
   await page.waitForSelector("canvas.mapa-canvas", { timeout: 10000 });

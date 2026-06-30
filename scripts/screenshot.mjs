@@ -2,7 +2,7 @@ import puppeteer from "puppeteer";
 import path from "path";
 import fs from "fs";
 
-const BASE = "http://localhost:5173/";
+const BASE = "http://localhost:5173/app/";
 const OUT = "docs/screenshots";
 
 fs.mkdirSync(OUT, { recursive: true });

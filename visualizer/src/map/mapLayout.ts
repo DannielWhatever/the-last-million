@@ -1,32 +1,36 @@
-// Layout del mapa en coordenadas lógicas (pixel-art). NO cambia la lógica del
-// experimento: solo traduce el mismo conjunto de lugares/players de antes a
-// posiciones en un lienzo para dibujarlos como un pequeño mundo RPG.
+// Layout del mapa sobre la imagen de fondo (mapa_v1.png). NO cambia la lógica
+// del experimento: solo traduce el mismo conjunto de lugares/players a posiciones
+// en píxeles de la imagen para colocarlos encima. Los rectángulos de cada sala
+// se midieron sobre mapa_v1.png (1488×716).
 
 import type { SimLog, WorldView } from "../types";
 import { LUGAR_POS } from "../theme";
 
-export const TILE = 16;
-const ROOM_W = 10; // tiles (exterior, incl. muros)
-const ROOM_H = 7;
-const GAP = 2;
-const MARGIN = 1;
+// Tamaño nativo de la imagen del mapa (= tamaño del canvas lógico).
+export const CANVAS_W = 1488;
+export const CANVAS_H = 716;
 
-export const CANVAS_W = (MARGIN + 3 * ROOM_W + 2 * GAP + MARGIN) * TILE; // 576
-export const CANVAS_H = (MARGIN + 2 * ROOM_H + 1 * GAP + MARGIN) * TILE; // 288
+// Alto en px con que se dibuja el sprite del Player sobre el mapa.
+export const SPRITE_H = 84;
+
+// Grosor aproximado de los muros, para meter a los Player dentro del suelo.
+const WALL = 32;
+// Fracción del alto interior donde quedan los pies (mitad-baja, sobre el suelo).
+const FEET_FRAC = 0.6;
 
 export interface Rect { x: number; y: number; w: number; h: number; }
 
-export function roomRect(col: number, row: number): Rect {
-  return {
-    x: (MARGIN + (col - 1) * (ROOM_W + GAP)) * TILE,
-    y: (MARGIN + (row - 1) * (ROOM_H + GAP)) * TILE,
-    w: ROOM_W * TILE,
-    h: ROOM_H * TILE,
-  };
-}
+// Rectángulos exteriores (muros incluidos) de cada lugar en píxeles de la imagen.
+export const ROOM_RECTS: Record<string, Rect> = {
+  sala_a: { x: 43, y: 37, w: 422, h: 297 },
+  plaza: { x: 552, y: 37, w: 423, h: 297 },
+  sala_b: { x: 1061, y: 37, w: 422, h: 297 },
+  mercado: { x: 43, y: 417, w: 423, h: 298 },
+  dormitorios: { x: 1061, y: 417, w: 422, h: 298 },
+};
 
 export function interior(r: Rect): Rect {
-  return { x: r.x + TILE, y: r.y + TILE, w: r.w - 2 * TILE, h: r.h - 2 * TILE };
+  return { x: r.x + WALL, y: r.y + WALL, w: r.w - 2 * WALL, h: r.h - 2 * WALL };
 }
 
 export interface RoomInfo {
@@ -42,7 +46,7 @@ export interface PlayerInfo {
   lugar: string;
   estado: string;
   vivo: boolean;
-  x: number; // centro (pies) en px lógicos
+  x: number; // centro (pies) en px de la imagen
   feetY: number;
   headTopY: number;
 }
@@ -65,13 +69,13 @@ export function computeLayout(log: SimLog, world: WorldView): MapLayout {
   const players: PlayerInfo[] = [];
 
   for (const lugar of log.config.lugares) {
-    const pos = LUGAR_POS[lugar] ?? { col: 1, row: 1, label: lugar };
-    const rect = roomRect(pos.col, pos.row);
+    const rect = ROOM_RECTS[lugar] ?? { x: 0, y: 0, w: 200, h: 200 };
+    const label = LUGAR_POS[lugar]?.label ?? lugar;
     const ocupantes = porLugar[lugar] ?? [];
     const vivosPresentes = ocupantes.filter(
       (a) => world.agentes[a]?.vivo && world.agentes[a]?.estado !== "en_transito",
     );
-    rooms.push({ lugar, label: pos.label, rect, conversa: vivosPresentes.length >= 2 });
+    rooms.push({ lugar, label, rect, conversa: vivosPresentes.length >= 2 });
 
     // Players alineados en una fila en la mitad-baja del interior.
     const inr = interior(rect);
@@ -79,7 +83,7 @@ export function computeLayout(log: SimLog, world: WorldView): MapLayout {
     ocupantes.forEach((a, i) => {
       const ag = world.agentes[a];
       const cx = inr.x + (inr.w * (i + 1)) / (n + 1);
-      const feetY = inr.y + inr.h * 0.66;
+      const feetY = inr.y + inr.h * FEET_FRAC;
       players.push({
         id: a,
         name: log.config.nombres[a] ?? a,
@@ -88,7 +92,7 @@ export function computeLayout(log: SimLog, world: WorldView): MapLayout {
         vivo: ag.vivo,
         x: Math.round(cx),
         feetY: Math.round(feetY),
-        headTopY: Math.round(feetY - 16),
+        headTopY: Math.round(feetY - SPRITE_H),
       });
     });
   }

@@ -3,21 +3,25 @@ import type { SimLog, WorldView } from "../types";
 import { COLOR_AGENTE } from "../theme";
 import { CANVAS_W, CANVAS_H, computeLayout } from "../map/mapLayout";
 import { drawWorld } from "../map/mapRenderer";
+import { sheet } from "../map/spriteSheet";
+import { mapImg } from "../map/mapImage";
+import { useAssetsReady } from "../map/assets";
 
-// Mapa del mundo como un pequeño RPG pixel-art (§18.2/§18.3). Mismo layout, mismos
-// lugares y mismos datos que antes: solo cambia el render. El texto (carteles y
-// nombres) va en un overlay HTML para que quede nítido y no pixelado.
+// Mapa del mundo: la imagen mapa_v1.png de fondo con los Player dibujados encima
+// en un canvas (§18). Los rótulos de los lugares ya vienen en la imagen; solo se
+// superponen en HTML los nombres de los Player para que queden nítidos.
 export function MapView({ log, world }: { log: SimLog; world: WorldView }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const layout = useMemo(() => computeLayout(log, world), [log, world]);
+  const ready = useAssetsReady(sheet, mapImg);
 
   useEffect(() => {
     const cv = canvasRef.current;
     if (!cv) return;
     const ctx = cv.getContext("2d");
     if (!ctx) return;
-    drawWorld(ctx, log, world, layout);
-  }, [log, world, layout]);
+    drawWorld(ctx, log, world, layout, mapImg.get());
+  }, [log, world, layout, ready]);
 
   const pct = (x: number, total: number) => `${(x / total) * 100}%`;
 
@@ -25,18 +29,6 @@ export function MapView({ log, world }: { log: SimLog; world: WorldView }) {
     <div className="mapa-wrap" style={{ aspectRatio: `${CANVAS_W} / ${CANVAS_H}` }}>
       <canvas ref={canvasRef} width={CANVAS_W} height={CANVAS_H} className="mapa-canvas" />
       <div className="mapa-overlay">
-        {layout.rooms.map((room) => (
-          <span
-            key={room.lugar}
-            className="lugar-cartel"
-            style={{
-              left: pct(room.rect.x + room.rect.w / 2, CANVAS_W),
-              top: pct(room.rect.y + 7, CANVAS_H),
-            }}
-          >
-            {room.label}
-          </span>
-        ))}
         {layout.players.map((p) => (
           <span
             key={p.id}
